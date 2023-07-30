@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<Extern href="stdidcmd.h"/>
+	<Extern href="vsshlids.h"/>
+	<Include href="KnownImageIds.vsct"/>
+	<Include href="VSGlobals.vsct"/>
+
+	<Commands package="VSTScanCodeView">
+		<!--This section defines the elements the user can interact with, like a menu command or a button or combo box in a toolbar. -->
+		<Menus>
+			<Menu guid="VSTScanCodeView" id="ScanCodeWindowToolbar" type="ToolWindowToolbar">
+				<CommandFlag>DefaultDocked</CommandFlag>
+				<Strings>
+					<ButtonText>TScanCode视图工具栏</ButtonText>
+				</Strings>
+			</Menu>
+			<Menu guid="VSTScanCodeView" id="ScanCodeWindowMenu" priority="0x0200" type="Menu">
+				<Parent guid="VSMainMenu" id="Extensions.DefaultGroup"/>
+				<Strings>
+					<ButtonText>TScanCode View</ButtonText>
+				</Strings>
+			</Menu>
+		</Menus>
+		<Groups>
+			<Group guid="VSTScanCodeView" id="ScanCodeWindowToolbarGroup" priority="0x0000">
+				<Parent guid="VSTScanCodeView" id="ScanCodeWindowToolbar"/>
+			</Group>	
+			<Group guid="VSTScanCodeView" id="ScanCodeWindowMenuGroup" priority="0x0600">
+				<Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+			</Group>			
+		</Groups>
+		<Buttons>
+			<Button guid="VSTScanCodeView" id="ViewResultCommand" priority="0x0100" type="Button">
+				<Parent guid="VSMainMenu" id="View.DevWindowsGroup.OtherWindows.Group1"/>
+				<Icon guid="ImageCatalogGuid" id="ToolWindow" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>TScanCode代码扫描结果</ButtonText>
+					<LocCanonicalName>.TScanCode.VSTScanCodeView</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="VSTScanCodeView" id="ScanCurrentFileCommandButton" priority="0x0001" type="Button">
+				<Parent guid="VSTScanCodeView" id="ScanCodeWindowToolbarGroup"/>
+					  <Icon guid="ImageCatalogGuid" id="CurrentFile" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>扫描当前文件</ButtonText>
+					<LocCanonicalName>.TScanCode.ScanCurrentFile</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="VSTScanCodeView" id="ScanFolderCommandButton" priority="0x0002" type="Button">
+				<Parent guid="VSTScanCodeView" id="ScanCodeWindowToolbarGroup"/>
+				<Icon guid="ImageCatalogGuid" id="OpenFolder" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>扫描指定目录</ButtonText>
+					<LocCanonicalName>.TScanCode.ScanFolder</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="VSTScanCodeView" id="ScanFileAndShowCommandButton" priority="0x0100" type="Button">
+				<Parent guid="VSTScanCodeView" id="ScanCodeWindowMenuGroup"/>
+				<Icon guid="ImageCatalogGuid" id="CodeAnalysisWindow" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>扫描当前文件</ButtonText>
+					<LocCanonicalName>.TScanCode.ScanFile</LocCanonicalName>
+				</Strings>
+			</Button>
+			<Button guid="VSTScanCodeView" id="ScanFolderAndShowCommandButton" priority="0x0100" type="Button">
+				<Parent guid="VSTScanCodeView" id="ScanCodeWindowMenuGroup"/>
+				<Icon guid="ImageCatalogGuid" id="CodeAnalysisWindow" />
+				<CommandFlag>IconIsMoniker</CommandFlag>
+				<Strings>
+					<ButtonText>扫描指定目录</ButtonText>
+					<LocCanonicalName>.TScanCode.ScanFile</LocCanonicalName>
+				</Strings>
+			</Button>
+		</Buttons>
+	</Commands>
+	<Symbols>
+		<GuidSymbol name="VSTScanCodeView" value="{780e4dc3-872c-4f9d-927d-51f05e5b5d3c}">
+			<IDSymbol name="ViewResultCommand" value="0x0100" />
+			<IDSymbol name="ScanCodeWindowToolbar" value="0x1000"/>
+			<IDSymbol name="ScanCodeWindowToolbarGroup" value="0x1050"/>
+			<IDSymbol name="ScanCurrentFileCommandButton" value="0x0111"/>
+			<IDSymbol name="ScanFolderCommandButton" value="0x0112"/>
+			<IDSymbol name="ScanFileAndShowCommandButton" value="0x0113"/>
+			<IDSymbol name="ScanFolderAndShowCommandButton" value="0x0114"/>
+			
+			<IDSymbol name="ScanCodeWindowMenu" value="0x1001"/>
+			<IDSymbol name="ScanCodeWindowMenuGroup" value="0x1100"/>
+		</GuidSymbol>
+	</Symbols>
+</CommandTable>
