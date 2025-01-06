@@ -1,0 +1,31 @@
+{
+  "Tasks": [
+    {
+      "Label": "执行批处理",
+      "Program": "cmd.exe",
+      "IsBackground": true,
+      "Arguments": [
+        "/c",
+        "${userHome}/run.bat"
+      ],
+      "Group": "Test"
+    },
+    {
+      "Label": "执行Python",
+      "Program": "python",
+      "IsBackground": false,
+      "Group": "Tool"
+    }
+  ],
+  "Services": [
+    {
+      "Label": "关键字自动补全",
+      "Program": "python",
+      "IsBackground": true,
+      "Group": "Intellisense",
+      "Arguments": [
+        "${userHome}/completer.py"
+      ]
+    }
+  ]
+}

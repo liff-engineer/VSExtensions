@@ -1,0 +1,21 @@
+﻿<platform:DialogWindow  x:Class="Aid.CommandPaletteDialogWindow"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                        xmlns:platform="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+                        xmlns:toolkit="clr-namespace:Community.VisualStudio.Toolkit;assembly=Community.VisualStudio.Toolkit"
+                        toolkit:Themes.UseVsTheme="True"
+                        xmlns:local="clr-namespace:Aid.Shared"
+                        mc:Ignorable="d"
+                        Width="600"
+                        Height="400"
+                        d:DesignHeight="600"
+                        d:DesignWidth="400">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <local:CommandPalette Grid.Row="0" x:Name="CommandPalette"/>
+    </Grid>
+</platform:DialogWindow>

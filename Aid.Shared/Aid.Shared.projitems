@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>b565aa29-09bb-4d09-8b8b-7594fa0e327a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Aid.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ILogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implement\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implement\ProcessCommandRequester.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implement\ProcessRequester.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Intellisense\AsyncCompletionCommitManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Intellisense\AsyncCompletionCommitManagerProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Intellisense\AsyncCompletionSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Intellisense\AsyncCompletionSourceProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implement\ProcessDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IRequester.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protocol\CommandDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protocol\CompletionDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protocol\CompletionRequestDescriptor.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Protocol\CompletionSuggestedItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Requester.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Test\TestCompletionRequester.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ViewModel\CommandPaletteViewModel.cs" />
+  </ItemGroup>
+</Project>
