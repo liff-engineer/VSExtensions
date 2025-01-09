@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.Language.Intellisense.AsyncCompletion;
+using Microsoft.VisualStudio.Text.Classification;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Text.Operations;
 using Microsoft.VisualStudio.Utilities;
@@ -19,7 +20,9 @@ namespace Aid.Shared.Intellisense
         // Disable "Field is never assigned to..." compiler's warning. Justification: the field is assigned by MEF.
 #pragma warning disable 649
         [Import]
-        private readonly ITextStructureNavigatorSelectorService StructureNavigatorSelector;
+        internal ITextStructureNavigatorSelectorService StructureNavigatorSelector { get; set; }
+        [Import]
+        internal IClassifierAggregatorService ClassifierAggregatorService { get; set; }
 #pragma warning restore 649
 
         public IAsyncCompletionSource GetOrCreate(ITextView textView)
@@ -27,7 +30,7 @@ namespace Aid.Shared.Intellisense
             if (cache.TryGetValue(textView, out var itemSource))
                 return itemSource;
 
-            var source = new AsyncCompletionSource(StructureNavigatorSelector); // opportunity to pass in MEF parts
+            var source = new AsyncCompletionSource(StructureNavigatorSelector, ClassifierAggregatorService); // opportunity to pass in MEF parts
             textView.Closed += (o, e) => cache.Remove(textView); // clean up memory as files are closed
             cache.Add(textView, source);
             return source;

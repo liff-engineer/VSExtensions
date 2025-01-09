@@ -16,6 +16,9 @@ using System.Linq;
 
 using static Microsoft.VisualStudio.Threading.AsyncReaderWriterLock;
 using Newtonsoft.Json.Linq;
+using Microsoft.VisualStudio.Text.Classification;
+using Microsoft.VisualStudio.Threading;
+using static Microsoft.VisualStudio.Shell.ThreadedWaitDialogHelper;
 
 namespace Aid.Shared.Intellisense
 {
@@ -23,13 +26,13 @@ namespace Aid.Shared.Intellisense
     {
         private Requester Requester { get; }
         private ITextStructureNavigatorSelectorService StructureNavigatorSelector { get; }
+        private IClassifierAggregatorService ClassifierAggregatorService { get; }
         private Dictionary<int, ImageElement> ImageElements;
-
-        public AsyncCompletionSource(ITextStructureNavigatorSelectorService structureNavigatorSelector)
+        public AsyncCompletionSource(ITextStructureNavigatorSelectorService structureNavigatorSelector, IClassifierAggregatorService classifierAggregatorService)
         {
             Requester = Requester.Instance;
             StructureNavigatorSelector = structureNavigatorSelector;
-            //ThreadHelper.ThrowIfNotOnUIThread();
+            ClassifierAggregatorService = classifierAggregatorService;
             //图标缓存
             ImageElements = new();
         }
@@ -48,6 +51,7 @@ namespace Aid.Shared.Intellisense
             requestDescriptor.Word = tokenSpan.GetText();
             requestDescriptor.Position = triggerLocation.Position;
             bool firstSpace = (trigger.Character == ' ');
+            //空格响应是十分频繁的,因而只返回当前行的tokens
             if (descriptor.ResponseFirstSpace && firstSpace)
             {
                 var spans = GetWords(triggerLocation);
@@ -56,14 +60,15 @@ namespace Aid.Shared.Intellisense
                 {
                     requestDescriptor.Words.Add(span.GetText());
                 }
-                //if (requestDescriptor.Words.Count > 0)
-                //{
-                //    requestDescriptor.Word = requestDescriptor.Words[requestDescriptor.Words.Count - 1];
-                //}
+                SnapshotSpan searchSpan = new SnapshotSpan(triggerLocation.GetContainingLine().Start, triggerLocation);
+                requestDescriptor.Tokens = GetClassifications(triggerLocation.Snapshot.TextBuffer, searchSpan);
             }
             else
             {
-                requestDescriptor.Content = triggerLocation.Snapshot.GetText();
+                //目前仅仅返回触发位置之前的tokens
+                //requestDescriptor.Content = triggerLocation.Snapshot.GetText();
+                SnapshotSpan searchSpan = new SnapshotSpan(triggerLocation.Snapshot, 0, triggerLocation.Position);
+                requestDescriptor.Tokens = GetClassifications(triggerLocation.Snapshot.TextBuffer, searchSpan);
             }
 
             List<CompletionSuggestedItem> suggestedItems = await Requester.ExecuteAsync<CompletionSuggestedItem>("CompletionSuggestedItems", null, JObject.FromObject(requestDescriptor), token);
@@ -94,6 +99,11 @@ namespace Aid.Shared.Intellisense
                 itemsBuilder.Add(completionItem);
             }
             return new CompletionContext(itemsBuilder.ToImmutableArray());
+        }
+
+        private void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
+        {
+            IClassifier classifier = ClassifierAggregatorService.GetClassifier(sender as ITextBuffer);
         }
 
         public Task<object> GetDescriptionAsync(IAsyncCompletionSession session, CompletionItem item, CancellationToken token)
@@ -166,21 +176,6 @@ namespace Aid.Shared.Intellisense
                 }
             }
             return CompletionStartData.DoesNotParticipateInCompletion;
-        }
-
-        private CompletionRequestDescriptor CreateRequestDescriptor(SnapshotPoint triggerLocation, out SnapshotSpan tokenSpan)
-        {
-            tokenSpan = FindTokenSpanAtPosition(triggerLocation);
-            CompletionRequestDescriptor payload = new()
-            {
-                ContentType = triggerLocation.Snapshot.ContentType.TypeName,
-                Word = tokenSpan.GetText(),
-                Position = triggerLocation.Position,
-                //LinePosition = triggerLocation.Position - triggerLocation.GetContainingLine().Start.Position,
-                //LineNumber = triggerLocation.GetContainingLine().LineNumber,
-                //Line = triggerLocation.GetContainingLine().GetText()
-            };
-            return payload;
         }
 
         private SnapshotSpan FindTokenSpanAtPosition(SnapshotPoint triggerLocation)
@@ -264,6 +259,37 @@ namespace Aid.Shared.Intellisense
             ImageElement image = new ImageElement(moniker.ToImageId());
             ImageElements[imageMonikerId] = image;
             return image;
+        }
+
+        private List<Classification> GetClassifications(ITextBuffer textBuffer,SnapshotSpan snapshotSpan)
+        {
+            List<Classification> results = new List<Classification>();
+            if (ClassifierAggregatorService == null) return results;
+            //GetClassifier必须要在主线程调用,否则会抛异常,且无法捕获
+            //IClassifier classifier = ClassifierAggregatorService.GetClassifier(textBuffer);
+            IClassifier classifier = Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext.Factory.Run(async () =>
+            {
+                // 切换到 UI 线程
+                await Microsoft.VisualStudio.Shell.ThreadHelper.JoinableTaskContext.Factory.SwitchToMainThreadAsync();
+
+                // 现在可以安全地调用 GetClassifier
+                return ClassifierAggregatorService?.GetClassifier(textBuffer);
+            });
+
+            IList<ClassificationSpan> classificationSpans = classifier.GetClassificationSpans(snapshotSpan);
+            foreach (ClassificationSpan classificationSpan in classificationSpans)
+            {
+                Classification classification = new Classification()
+                {
+                    Name = classificationSpan.ClassificationType.Classification,
+                    Text = classificationSpan.Span.GetText(),
+                    Start = classificationSpan.Span.Start.Position,
+                    Length = classificationSpan.Span.Length,
+                    LineNumber = snapshotSpan.Snapshot.GetLineNumberFromPosition(classificationSpan.Span.Start)
+                };
+                results.Add(classification);
+            }
+            return results;
         }
     }
 }

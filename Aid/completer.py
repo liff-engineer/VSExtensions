@@ -80,18 +80,12 @@ def CompletionSuggestedItems(argument):
     raise RuntimeError("无法识别的信息")
 
 
-@dispatch.register
-def Topics():
-    results = dispatch.callables()
-    # TODO FIXME 以类方式注册的方法也需要报告
-    return results
-
-
 if __name__ == "__main__":
     logging.basicConfig(
         level=logging.DEBUG,
         filename="completer.log",
         filemode='w',
+        encoding='utf-8',
         format='%(name)s - %(levelname)s - %(message)s'
     )
     dispatch.server().run()

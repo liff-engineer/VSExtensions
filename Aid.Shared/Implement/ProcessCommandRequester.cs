@@ -19,9 +19,13 @@ namespace Aid.Shared.Implement
         public string Identity { get; }
         public Dictionary<string,ProcessDescriptor> Commands  = new Dictionary<string, ProcessDescriptor> ();
         private Requester Requester { get; }
-        public ProcessCommandRequester(string identity, Dictionary<string, ProcessDescriptor> commands)
+
+        public RequesterKind Kind { get; }
+
+        public ProcessCommandRequester(RequesterKind kind,string identity, Dictionary<string, ProcessDescriptor> commands)
         {
             Requester = Requester.Instance;
+            Kind = kind;
             Identity = identity;
             Commands = commands;
         }

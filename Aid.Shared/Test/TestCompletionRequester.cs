@@ -9,6 +9,8 @@ namespace Aid.Shared.Test
     {
         public string Identity { get; set; }
 
+        public RequesterKind Kind { get; } = RequesterKind.Internal;
+
         public TestCompletionRequester()
         {
             Identity = "TestCompletionDescriptor";

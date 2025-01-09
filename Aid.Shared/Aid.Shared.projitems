@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)ILogger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Implement\InspectRequester.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Implement\Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Implement\ProcessCommandRequester.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Implement\ProcessRequester.cs" />

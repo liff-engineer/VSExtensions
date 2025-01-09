@@ -63,6 +63,16 @@ class reporter:
         return results
 
 
+@register
+def Topics():
+    results = list(registry.keys())
+    for obj in objectRegistry:
+        callables = [m for m in dir(obj) if callable(
+            getattr(obj, m)) and not m.startswith('__')]
+        results.extend(callables)
+    return results
+
+
 def process_request(request):
     id = request.get('Id', -1)
     topic = request.get('Topic', None)

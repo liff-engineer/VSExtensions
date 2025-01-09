@@ -85,9 +85,9 @@ namespace Aid.Shared
                 }
                 Requesters.Clear();
             }
-
-            Load(UserHome);
-            Load(WorkspaceFolder);
+            Requesters.Add(new InspectRequester(Name));
+            Load(RequesterKind.User,UserHome);
+            Load(RequesterKind.Workspace, WorkspaceFolder);
         }
 
         public static void ParseResponse<T>(Object response,ref List<T> results)
@@ -144,13 +144,21 @@ namespace Aid.Shared
             }
         }
 
-        private void Load(string folder)
+        private void Load(RequesterKind Kind,string folder)
         {
             if (folder == null) return;
 
             string prefix = folder == UserHome ? "User." : "Workspace.";
             string file = Path.Combine(folder, ConfigureFile);
             if (!File.Exists(file)) { return; }
+
+            //移除原有Requester
+            foreach (IRequester requester in Requesters)
+            {
+                if (requester.Kind != Kind) continue;
+                requester.Dispose();
+            }
+            Requesters.RemoveAll(requester=>requester.Kind == Kind);
 
             List<ProcessDescriptor> taskDescriptiors = ProcessDescriptor.Load(file, "Tasks");
             Dictionary<string, ProcessDescriptor> commands = new Dictionary<string, ProcessDescriptor> { };
@@ -160,13 +168,13 @@ namespace Aid.Shared
                 descriptor.Variables.Add("fileFolder", folder);
                 commands[Guid.NewGuid().ToString()] = descriptor;
             }
-            Requesters.Add(new ProcessCommandRequester($"{prefix}Tasks", commands));
+            Requesters.Add(new ProcessCommandRequester(Kind,$"{prefix}Tasks", commands));
             List<ProcessDescriptor> processDescriptors = ProcessDescriptor.Load(file, "Services");
             foreach (var descriptor in processDescriptors)
             {
                 descriptor.Variables = new Dictionary<string, object>(Variables);
                 descriptor.Variables.Add("fileFolder", folder);
-                Requesters.Add(new ProcessRequester($"{prefix}Service." + Guid.NewGuid().ToString(), descriptor));
+                Requesters.Add(new ProcessRequester(Kind, $"{prefix}Service." + Guid.NewGuid().ToString(), descriptor));
             }
         }
 
@@ -294,7 +302,7 @@ namespace Aid.Shared
             }
             Logger.Info($"配置文件 {e.FullPath} 发生变化，重新加载。");
             NotifyStatusChanged($"[Aid]配置文件 {e.FullPath} 发生变化，重新加载。");
-            //TODO FIXME 加载配置
+            Load(RequesterKind.Workspace, WorkspaceFolder);
         }
 
         private void UserHomeWatcher_Changed(object sender, FileSystemEventArgs e)
@@ -305,7 +313,7 @@ namespace Aid.Shared
             }
             Logger.Info($"配置文件 {e.FullPath} 发生变化，重新加载。");
             NotifyStatusChanged($"[Aid]配置文件 {e.FullPath} 发生变化，重新加载。");
-            //TODO FIXME 加载配置
+            Load(RequesterKind.User,UserHome);
         }
     }
 }

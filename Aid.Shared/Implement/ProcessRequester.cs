@@ -22,9 +22,12 @@ namespace Aid.Shared.Implement
 
         private List<string> Topics { get; set; } = new List<string>() { "Topics"};
 
-        public ProcessRequester(string identity, ProcessDescriptor descriptor)
+        public RequesterKind Kind { get; }
+
+        public ProcessRequester(RequesterKind kind,string identity, ProcessDescriptor descriptor)
         {
             Requester = Requester.Instance;
+            Kind = kind;
             Identity = identity;
             Descriptor = descriptor;
         }
